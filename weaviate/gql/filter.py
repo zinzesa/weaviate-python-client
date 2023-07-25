@@ -423,6 +423,161 @@ class NearImage(Filter):
         return near_image + "} "
 
 
+class NearMedia(Filter):
+    def __init__(
+        self,
+        content: dict,
+        media_type: str,
+    ):
+        """
+        Initialize a NearAudio class instance.
+
+        Parameters
+        ----------
+        content : list
+            The content of the `nearAudio` clause.
+
+        Raises
+        ------
+        TypeError
+            If 'content' is not of type dict.
+        TypeError
+            If 'content["image"]' is not of type str.
+        ValueError
+            If 'content'  has key "certainty"/"distance" but the value is not float.
+        """
+
+        super().__init__(content)
+
+        if media_type not in self._content:
+            raise ValueError('"content" is missing the mandatory key "{media_type}"!')
+
+        _check_type(var_name=media_type, value=self._content[media_type], dtype=str)
+        if "certainty" in self._content:
+            if "distance" in self._content:
+                raise ValueError(
+                    "Cannot have both 'certainty' and 'distance' at the same time. "
+                    "Only one is accepted."
+                )
+            _check_type(var_name="certainty", value=self._content["certainty"], dtype=float)
+        if "distance" in self._content:
+            _check_type(var_name="distance", value=self._content["distance"], dtype=float)
+
+        self._media_type = media_type
+
+    def __str__(self):
+        near_audio = f'near{self._media_type.capitalize()}: {{{self._media_type}: "{self._content[self._media_type]}"'
+        if "certainty" in self._content:
+            near_audio += f' certainty: {self._content["certainty"]}'
+        if "distance" in self._content:
+            near_audio += f' distance: {self._content["distance"]}'
+        return near_audio + "} "
+
+
+class NearAudio(Filter):
+    """
+    NearObject argument used to filter weaviate objects.
+    """
+
+    def __init__(
+        self,
+        content: dict,
+    ):
+        """
+        Initialize a NearAudio class instance.
+
+        Parameters
+        ----------
+        content : list
+            The content of the `nearAudio` clause.
+
+        Raises
+        ------
+        TypeError
+            If 'content' is not of type dict.
+        TypeError
+            If 'content["image"]' is not of type str.
+        ValueError
+            If 'content'  has key "certainty"/"distance" but the value is not float.
+        """
+
+        super().__init__(content)
+
+        if "audio" not in self._content:
+            raise ValueError('"content" is missing the mandatory key "audio"!')
+
+        _check_type(var_name="audio", value=self._content["audio"], dtype=str)
+        if "certainty" in self._content:
+            if "distance" in self._content:
+                raise ValueError(
+                    "Cannot have both 'certainty' and 'distance' at the same time. "
+                    "Only one is accepted."
+                )
+            _check_type(var_name="certainty", value=self._content["certainty"], dtype=float)
+        if "distance" in self._content:
+            _check_type(var_name="distance", value=self._content["distance"], dtype=float)
+
+    def __str__(self):
+        near_audio = f'nearAudio: {{audio: "{self._content["audio"]}"'
+        if "certainty" in self._content:
+            near_audio += f' certainty: {self._content["certainty"]}'
+        if "distance" in self._content:
+            near_audio += f' distance: {self._content["distance"]}'
+        return near_audio + "} "
+
+
+class NearVideo(Filter):
+    """
+    NearObject argument used to filter weaviate objects.
+    """
+
+    def __init__(
+        self,
+        content: dict,
+    ):
+        """
+        Initialize a NearAudio class instance.
+
+        Parameters
+        ----------
+        content : list
+            The content of the `nearVideo` clause.
+
+        Raises
+        ------
+        TypeError
+            If 'content' is not of type dict.
+        TypeError
+            If 'content["video"]' is not of type str.
+        ValueError
+            If 'content'  has key "certainty"/"distance" but the value is not float.
+        """
+
+        super().__init__(content)
+
+        if "video" not in self._content:
+            raise ValueError('"content" is missing the mandatory key "video"!')
+
+        _check_type(var_name="video", value=self._content["video"], dtype=str)
+        if "certainty" in self._content:
+            if "distance" in self._content:
+                raise ValueError(
+                    "Cannot have both 'certainty' and 'distance' at the same time. "
+                    "Only one is accepted."
+                )
+            _check_type(var_name="certainty", value=self._content["certainty"], dtype=float)
+        if "distance" in self._content:
+            _check_type(var_name="distance", value=self._content["distance"], dtype=float)
+
+    def __str__(self):
+        near_video = f'nearVideo: {{video: "{self._content["video"]}"'
+        if "certainty" in self._content:
+            near_video += f' certainty: {self._content["certainty"]}'
+        if "distance" in self._content:
+            near_video += f' distance: {self._content["distance"]}'
+        return near_video + "} "
+
+
 class Sort(Filter):
     """
     Sort filter class used to sort weaviate objects.
