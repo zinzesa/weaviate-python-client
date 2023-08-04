@@ -255,15 +255,12 @@ def test_search_with_tenant(client: weaviate.Client):
 
 
 def test_empty_search_returns_everything(client: weaviate.Client):
-    client.collection.delete("TestReturnEverythingORM")
-
     class TestReturnEverythingORM(BaseProperty):
         name: Optional[str] = None
 
-    client.collection_model.delete("TestReturnEverythingORM")
+    client.collection_model.delete(TestReturnEverythingORM)
     collection = client.collection_model.create(
         CollectionModelConfig(
-            name="TestReturnEverythingORM",
             model=TestReturnEverythingORM,
             vectorizer=Vectorizer.NONE,
         )
