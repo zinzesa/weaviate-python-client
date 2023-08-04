@@ -1,6 +1,7 @@
-import uuid as uuid_package
 from dataclasses import dataclass
 from typing import Dict, Any, Optional, List, Union
+
+import uuid as uuid_package
 
 from weaviate.collection.classes import (
     CollectionConfig,
@@ -10,6 +11,7 @@ from weaviate.collection.classes import (
     RefToObject,
     BatchReference,
     DataObject,
+    _MetadataFromDict,
 )
 from weaviate.collection.collection_base import CollectionBase, CollectionObjectBase
 from weaviate.collection.grpc import (
@@ -371,7 +373,7 @@ class CollectionObject(CollectionObjectBase):
     def _json_to_object(self, obj: Dict[str, Any]) -> _Object:
         return _Object(
             data={prop: val for prop, val in obj["properties"].items()},
-            metadata=_MetadataReturn(obj),
+            metadata=_MetadataFromDict(obj),
         )
 
 
