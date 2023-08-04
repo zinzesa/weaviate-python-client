@@ -405,3 +405,23 @@ def test_search_with_tenant(client: weaviate.Client):
 
     objects2 = tenant2.query.bm25_flat(query="some", return_metadata=MetadataQuery(uuid=True))
     assert len(objects2) == 0
+
+
+def test_empty_search_returns_everything(client: weaviate.Client):
+    client.collection.delete("TestReturnEverything")
+    collection = client.collection.create(
+        CollectionConfig(
+            name="TestReturnEverything",
+            vectorizer=Vectorizer.NONE,
+            properties=[Property(name="name", dataType=DataType.TEXT)],
+        )
+    )
+    collection.data.insert(data={"name": "word"})
+
+    objects = collection.query.bm25_flat(query="word")
+    assert "name" in objects[0].data
+    assert objects[0].data["name"] == "word"
+    assert objects[0].metadata.uuid is not None
+    assert objects[0].metadata.score is not None
+    assert objects[0].metadata.last_update_time_unix is not None
+    assert objects[0].metadata.creation_time_unix is not None

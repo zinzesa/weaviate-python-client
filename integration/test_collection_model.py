@@ -252,3 +252,28 @@ def test_search_with_tenant(client: weaviate.Client):
 
     objects2 = tenant2.query.bm25_flat(query="some", return_metadata=MetadataQuery(uuid=True))
     assert len(objects2) == 0
+
+
+def test_empty_search_returns_everything(client: weaviate.Client):
+    client.collection.delete("TestReturnEverythingORM")
+
+    class TestReturnEverythingORM(BaseProperty):
+        name: Optional[str] = None
+
+    client.collection_model.delete("TestReturnEverythingORM")
+    collection = client.collection_model.create(
+        CollectionModelConfig(
+            name="TestReturnEverythingORM",
+            model=TestReturnEverythingORM,
+            vectorizer=Vectorizer.NONE,
+        )
+    )
+    collection.data.insert(TestReturnEverythingORM(name="word"))
+
+    objects = collection.query.bm25_flat(query="word")
+    assert objects[0].data.name is not None
+    assert objects[0].data.name == "word"
+    assert objects[0].metadata.uuid is not None
+    assert objects[0].metadata.score is not None
+    assert objects[0].metadata.last_update_time_unix is not None
+    assert objects[0].metadata.creation_time_unix is not None
