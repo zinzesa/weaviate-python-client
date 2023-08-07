@@ -1,23 +1,14 @@
-import uuid as uuid_package
-from dataclasses import dataclass
 from typing import Type, Optional, Any, List, Dict, Generic, Tuple, Union
+
+import uuid as uuid_package
 from pydantic import create_model
 from requests.exceptions import ConnectionError as RequestsConnectionError
 
-from weaviate.collection.classes import (
-    BaseProperty,
-    BatchReference,
-    CollectionModelConfig,
-    Errors,
-    MetadataGet,
-    _MetadataReturn,
-    Model,
-    UserModelType,
-)
 from weaviate.collection.collection_base import (
     CollectionBase,
     CollectionObjectBase,
 )
+from weaviate.collection.collection_classes import Errors
 from weaviate.collection.grpc import (
     _GRPC,
     GrpcResult,
@@ -35,13 +26,17 @@ from weaviate.connect import Connection
 from weaviate.data.replication import ConsistencyLevel
 from weaviate.exceptions import UnexpectedStatusCodeException
 from weaviate.util import _capitalize_first_letter
+from weaviate.weaviate_classes import (
+    BaseProperty,
+    BatchReference,
+    CollectionModelConfig,
+    Metadata,
+    MetadataReturn,
+    Model,
+    UserModelType,
+    _Object,
+)
 from weaviate.weaviate_types import UUID, UUIDS, BEACON, PYTHON_TYPE_TO_DATATYPE
-
-
-@dataclass
-class _Object(Generic[Model]):
-    data: Model
-    metadata: _MetadataReturn
 
 
 class _Data(Generic[Model]):
@@ -103,14 +98,14 @@ class _Data(Generic[Model]):
         self.__collection._update(weaviate_obj, uuid)
 
     def get_by_id(
-        self, uuid: UUID, metadata: Optional[MetadataGet] = None
+        self, uuid: UUID, metadata: Optional[Metadata] = None
     ) -> Optional[_Object[Model]]:
         ret = self.__collection._get_by_id(uuid=uuid, metadata=metadata)
         if ret is None:
             return None
         return self.__collection._json_to_object(ret)
 
-    def get(self, metadata: Optional[MetadataGet] = None) -> Optional[List[_Object[Model]]]:
+    def get(self, metadata: Optional[Metadata] = None) -> Optional[List[_Object[Model]]]:
         ret = self.__collection._get(metadata=metadata)
         if ret is None:
             return None
@@ -395,7 +390,7 @@ class CollectionObjectModel(CollectionObjectBase, Generic[Model]):
                 obj["properties"][prop] = None
 
         model_object = _Object[Model](
-            data=self.__model(**obj["properties"]), metadata=_MetadataReturn(obj)
+            data=self.__model(**obj["properties"]), metadata=MetadataReturn(**obj)
         )
         model_object.data.uuid = model_object.metadata.uuid
         model_object.data.vector = model_object.metadata.vector

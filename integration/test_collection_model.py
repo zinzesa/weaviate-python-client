@@ -12,7 +12,7 @@ import pytest as pytest
 import uuid
 
 import weaviate
-from weaviate.collection.classes import (
+from weaviate.weaviate_classes import (
     BaseProperty,
     CollectionModelConfig,
     MultiTenancyConfig,
